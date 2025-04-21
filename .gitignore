@@ -1,0 +1,82 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Robot Framework logs and outputs
+*.log
+*.html
+*.xml
+*.tsv
+*.txt
+
+# Reports and results
+output.xml
+log.html
+report.html
+*.png
+*.gif
+*.pdf
+
+# Python environment files
+.env
+.venv/
+venv/
+ENV/
+env/
+*.env
+
+# IDE specific files
+.vscode/
+.idea/
+*.iml
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Selenium-related files
+chromedriver
+geckodriver
+chromedriver.exe
+geckodriver.exe
+
+# Jupyter notebooks checkpoints (if any)
+.ipynb_checkpoints/
+
+# Test data or secrets (if any)
+secrets/
+*.secret
+*.key
+
+# Pip dependencies
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Compiled Python modules
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Coverage reports
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Robot cache or custom outputs (optional)
+results/
+robotframework-reports/
