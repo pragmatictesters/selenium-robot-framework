@@ -1,21 +1,11 @@
 *** Settings ***
 Library       SeleniumLibrary
+Variables     ../resources/variables.py
+Resource     ../resources/dropdown-list-page.robot
+Resource     ../resources/browser_keywords.robot
 Test Setup    Open Browser In Incognito Mode    ${URL}
 Test Teardown    Close Browser
 
-
-*** Variables ***
-${URL}      https://the-internet.herokuapp.com
-
-
-*** Keywords ***
-Open Browser In Incognito Mode
-    [Documentation]    Open Chrome in incognito mode
-    [Arguments]    ${url}
-    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-    Call Method    ${options}    add_argument    --incognito
-    Create WebDriver    Chrome    options=${options}
-    Maximize Browser Window
 
 *** Test Cases ***
 
@@ -35,3 +25,16 @@ Dropdown List Test
     Select From List By Label    id=dropdown    Option 2
     Page Should Contain Element   xpath=//option[@value='2' and @selected]
     Element Text Should Be    //option[@selected]    Option 2
+
+Dropdown list test with Page Object 
+    [Documentation]    Launch Chrome in incognito and test dropdown list with Page Object
+    Go To    ${URL}/dropdown
+    Select Option By Label    Option 2
+    ${selected_option}=    Get Selected Option
+    Should Be Equal As Strings    ${selected_option}    Option 2
+    Select Option By Value    1
+    ${selected_option}=    Get Selected Option
+    Should Be Equal As Strings    ${selected_option}    Option 1
+    Select Option By Index    2
+    ${selected_option}=    Get Selected Option
+    Should Be Equal As Strings    ${selected_option}    Option 2
