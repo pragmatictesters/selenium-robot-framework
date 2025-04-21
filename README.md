@@ -1,50 +1,124 @@
-## ✅ Step 1: Activate your virtual environment
+# Robot Framework Automation Examples for The Internet Herokuapp
 
-Make sure you're in the project folder (`robot-demo`) and then run:
-
-```bash
-source venv/bin/activate
-```
-
-You should see `(venv)` appear in your terminal prompt — that’s how you know it’s active.
+This repository contains automation examples using the **Robot Framework** with **SeleniumLibrary** for interacting with components on [The Internet Herokuapp](https://the-internet.herokuapp.com/). It demonstrates real-world automation scenarios including working with alerts, context menus, dynamic elements, login flows, and more.
 
 ---
 
-## ✅ Step 2: Check if `robot` is installed
+## 📁 Folder Structure
 
-With the virtual environment activated, run:
-
-```bash
-pip show robotframework
+```
+robot-tests/
+│
+├── tests/                 # Test case files (.robot)
+├── resources/             # Page objects, keywords, and images
+├── test_data/             # Input data or supporting files
+├── results/               # Test execution reports and logs
+├── .gitignore
+└── README.md
 ```
 
-If it’s not installed, install it:
+---
+
+## 🛠️ Setup Instructions
+
+### 1. Install Python (Recommended: Python 3.8+)
+
+You can download Python from [python.org](https://www.python.org/downloads/). Make sure to check **"Add Python to PATH"** during installation.
+
+### 2. Install Robot Framework and SeleniumLibrary
 
 ```bash
 pip install robotframework
+pip install robotframework-seleniumlibrary
+```
+
+### 3. Install WebDriver (ChromeDriver)
+
+Ensure Chrome is installed and download the corresponding **ChromeDriver** from:
+[https://sites.google.com/chromium.org/driver/](https://sites.google.com/chromium.org/driver/)
+
+Place the driver in a folder that's in your system `PATH`.
+
+Alternatively, you can use `webdriver-manager`:
+
+```bash
+pip install webdriver-manager
+```
+
+### 4. Install VS Code or PyCharm (Optional but recommended)
+
+- **VS Code**: Install the "Robot Framework Language Server" extension.
+
+
+---
+
+## ▶️ Running Tests
+
+### Run all test cases
+
+```bash
+robot tests/
+```
+
+### Run a specific test suite
+
+```bash
+robot tests/test_login.robot
+```
+
+### Run with output directory
+
+```bash
+robot -d results tests/
 ```
 
 ---
 
-## ✅ Step 3: Run your Robot test
+## 🌐 Components Automated
 
-Now that the virtual environment is active and the package is installed, try:
+Examples cover components such as:
 
-```bash
-robot hello.robot
-```
-
-If it works, you’ll see Robot Framework log output and your test will run in Chrome!
+- Add/Remove Elements
+- Alerts & Modal Dialogs
+- Context Menu
+- Login & Error Handling
+- Dynamic Controls
+- File Uploads
+- Frames & Windows
+- JavaScript Alerts
+- and more...
 
 ---
 
-## ✅ Optional: Add `robot` to global PATH (for running without `venv`)
+## 🧪 Test Execution Reports
 
-If you ever want to run `robot` without activating your virtual environment each time, you can install it globally:
+After running the tests, Robot Framework will generate:
 
-```bash
-pip install --user robotframework
+- `report.html` – Summary of test execution
+- `log.html` – Detailed logs
+- `output.xml` – Raw result data
+
+All located inside the `results/` directory.
+
+---
+
+## ✅ Best Practices
+
+- Page Object style keyword definitions are stored in `resources/`.
+- Common variables (e.g., `${URL}`, `${BROWSER}`, `${TIMEOUT}`) are stored in `variables.py`.
+- Browser runs in incognito mode by default with additional ChromeOptions.
+
+---
+
+## 📷 Screenshots & Assets
+
+All visual assets and test data are stored under `resources/` and `test_data/` directories.
+
+
+---
+
+## 🧠 Author
+
+**Janesh Kodikara** 
+
 ```
-
-Then restart your terminal and try `robot --version`.
-
