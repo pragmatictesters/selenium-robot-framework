@@ -49,3 +49,4 @@ Drag and drop test with Page Object
     ${text-left}=    Get Text In Left Column
     Should Be Equal As Strings    ${text-right}    B
     Should Be Equal As Strings    ${text-left}    A
+
