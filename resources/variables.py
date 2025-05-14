@@ -1,3 +1,6 @@
 URL = "https://the-internet.herokuapp.com"
+SAUCE_URL = "https://www.saucedemo.com/"
 BROWSER = "Chrome"
 TIMEOUT = "10s"
+username =    "standard_user"
+password =   "secret_sauce"
