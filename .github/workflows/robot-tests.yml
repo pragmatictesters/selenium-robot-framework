@@ -1,41 +1,28 @@
-name: Run Robot Tests
+name: Selenium Tests
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
+on: [push]
 
 jobs:
-  robot-tests:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.x'
 
       - name: Install dependencies
         run: |
-          pip install robotframework
-          pip install robotframework-seleniumlibrary
-          pip install selenium
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser
-          echo "CHROME_BIN=$(which chromium-browser)" >> $GITHUB_ENV
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Make sure SeleniumLibrary is in this file
 
-      - name: Run Robot Framework Tests
-        env:
-          ROBOT_OPTIONS: --variable BROWSER:chrome
+      - name: Set Chrome executable (if needed)
+        run: |
+          echo "CHROME_BIN=/usr/bin/chromium-browser" >> $GITHUB_ENV
+
+      - name: Run Robot Framework tests
         run: |
           robot --variable BROWSER:chrome --outputdir results tests/selenium
-
-      - name: Upload Robot Framework results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: robot-results
-          path: results
