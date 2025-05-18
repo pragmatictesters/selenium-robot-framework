@@ -31,7 +31,7 @@ jobs:
         env:
           ROBOT_OPTIONS: --variable BROWSER:chrome
         run: |
-          robot --variable BROWSER:chrome --outputdir results tests/
+          robot --variable BROWSER:chrome --outputdir results tests/selenium
 
       - name: Upload Robot Framework results
         if: always()
