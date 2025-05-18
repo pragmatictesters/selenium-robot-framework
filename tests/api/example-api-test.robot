@@ -78,7 +78,6 @@ Test names of all the users
     Should Be Equal As Strings     ${user_data}[8][name]    Glenna Reichert
     Should Be Equal As Strings     ${user_data}[9][name]    Clementina DuBuque
 
-
 Test names of all the users using loop
     [Documentation]   Test names of all the users
     Create Session    mysession    ${BASE_URL}
