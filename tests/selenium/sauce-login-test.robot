@@ -1,8 +1,8 @@
 *** Settings ***
 Library    SeleniumLibrary
 Library    ../venv/lib/python3.13/site-packages/robot/libraries/String.py
-Variables    ../resources/variables.py
-Resource    ../resources/browser_keywords.robot
+Variables    ../../resources/variables.py
+Resource    ../../resources/browser_keywords.robot
 
 Test Setup    Custom Test Setup        
 Test Teardown    Close Browser
