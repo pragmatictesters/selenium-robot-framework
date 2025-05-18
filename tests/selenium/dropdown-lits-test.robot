@@ -1,8 +1,8 @@
 *** Settings ***
 Library       SeleniumLibrary
-Variables     ../resources/variables.py
-Resource     ../resources/dropdown-list-page.robot
-Resource     ../resources/browser_keywords.robot
+Variables     ../../resources/variables.py
+Resource     ../../resources/dropdown-list-page.robot
+Resource     ../../resources/browser_keywords.robot
 Test Setup    Open Browser In Incognito Mode    ${URL}
 Test Teardown    Close Browser
 

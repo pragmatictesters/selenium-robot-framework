@@ -2,7 +2,7 @@
 Library       SeleniumLibrary
 Test Setup    Open Browser In Incognito Mode    ${URL}
 Test Teardown    Close Browser
-Resource    ../resources/drag-and-drop-page.robot
+Resource    ../../resources/drag-and-drop-page.robot
 
 *** Variables ***
 ${URL}      https://the-internet.herokuapp.com
