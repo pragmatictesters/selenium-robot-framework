@@ -26,7 +26,7 @@ Login To The System
 
 
 Create a new contact
-    [Arguments]    ${firstName}    ${lastName}    ${email}    ${password}    ${token}
+    [Arguments]    ${firstName}    ${lastName}    ${email}    ${token}
     [Documentation]    Create a new user
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${payload}=    Create Dictionary    
@@ -88,7 +88,61 @@ Create a new contact with random data
     ${firstName_new_contact}=    Set Variable    Janesh${random_number}
     ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
     ${token}=    Login To The System    ${email}    ${password}
-    ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}    ${email}    ${password}    ${token}
+    ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}    ${email}    ${token}
+
+
+Update contact details 
+    [Documentation]    Update contact details
+    ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
+    ${firstName_new_contact}=    Set Variable    Janesh${random_number}
+    ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
+    ${token}=    Login To The System    ${email}    ${password}
+    ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
+    ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}   ${email}   ${token}
+    ${payload}=    Create Dictionary    
+     ...   firstName=${firstName_new_contact}  
+     ...   lastName=${lastName_new_contact}    
+     ...   email=${email} 
+     ...   phone=0712345678
+     ...   street1=123 Main St
+     ...   street2=Suite 100
+     ...   city=Colombo
+     ...   stateProvince=Western
+     ...   postalCode=12345
+     ...   country=Sri Lanka
+     ...   birthdate=1990-01-01
+    ${response}=    PUT On Session  Session   /contacts/${id}   json=${payload}  headers=${headers}
+    Should Be Equal As Numbers    ${response.status_code}    200
+    ${user_data}=    Set Variable    ${response.json()}
+    Should Be Equal    ${user_data['firstName']}    ${payload}[firstName]   
+    Should Be Equal    ${user_data['lastName']}    ${payload}[lastName]
+    Should Be Equal    ${user_data['email']}    ${payload}[email]    ignore_case=True
+    Should Be Equal    ${user_data['phone']}    ${payload}[phone]
+    Should Be Equal    ${user_data['street1']}    ${payload}[street1]
+    Should Be Equal    ${user_data['street2']}    ${payload}[street2]
+    Should Be Equal    ${user_data['city']}    ${payload}[city]
+    Should Be Equal    ${user_data['stateProvince']}    ${payload}[stateProvince]
+    Should Be Equal    ${user_data['postalCode']}    ${payload}[postalCode]
+    Should Be Equal    ${user_data['country']}    ${payload}[country] 
+
+
+Partial update of a contact details 
+    ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
+    ${firstName_new_contact}=    Set Variable    Janesh${random_number}
+    ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
+    ${token}=    Login To The System    ${email}    ${password}
+    ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
+    ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}   ${email}   ${token}
+    ${payload}=    Create Dictionary    
+     ...   firstName=${firstName_new_contact}  
+     ...   lastName=${lastName_new_contact}   
+    ${response}=    PATCH On Session  Session   /contacts/${id}   json=${payload}  headers=${headers}
+    Should Be Equal As Numbers    ${response.status_code}    200
+    ${user_data}=    Set Variable    ${response.json()}
+    Should Be Equal    ${user_data['firstName']}    ${payload}[firstName]   
+    Should Be Equal    ${user_data['lastName']}    ${payload}[lastName]
+    Should Be Equal    ${user_data['email']}    ${email}    ignore_case=True
+
 
 
 Get contact detais 
@@ -100,7 +154,7 @@ Get contact detais
     ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
     ${email_new_contact}=    Set Variable    ${firstName_new_contact}.${lastName_new_contact}@${domain}
     ${token}=    Login To The System    ${email}    ${password}
-    ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}    ${email_new_contact}    ${password}    ${token}
+    ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}    ${email_new_contact}    ${token}
     ${response}=    GET On Session  Session   /contacts/${id}   headers=${headers}
     Should Be Equal As Numbers    ${response.status_code}    200
     Log To Console    message: ${response.json()}
@@ -118,12 +172,10 @@ Delete a contact
     ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
     ${token}=    Login To The System    ${email}    ${password}
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
-    ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}    ${email}    ${password}    ${token}
+    ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}    ${email}    ${token}
     ${response}=    DELETE On Session  Session   /contacts/${id}   headers=${headers}
     Should Be Equal As Numbers    ${response.status_code}    200
     Should Be Equal As Strings    ${response.reason}    OK
     ${response}=    GET On Session  Session   /contacts/${id}   headers=${headers}    expected_status=ANY
     Should Be Equal As Numbers    ${response.status_code}    404
     Should Be Equal As Strings    ${response.reason}    Not Found
-
-    
