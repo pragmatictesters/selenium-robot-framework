@@ -1,4 +1,5 @@
 URL = "https://the-internet.herokuapp.com"
+API_URL = "https://thinking-tester-contact-list.herokuapp.com"
 SAUCE_URL = "https://www.saucedemo.com/"
 BROWSER = "Chrome"
 TIMEOUT = "10s"
