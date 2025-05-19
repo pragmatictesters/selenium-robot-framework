@@ -25,7 +25,7 @@ jobs:
           # Add any other Python dependencies your project needs here
           # For example:
           # pip install beautifulsoup4
-          pip install robotframework-request
+          pip install robotframework-requests
 
       - name: Set Chrome executable (if needed)
         run: |
