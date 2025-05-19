@@ -49,10 +49,12 @@ Crearte a new user with constact library
     ${user_data}=    Set Variable    ${response.json()}
     [RETURN]    ${user_data['user']['_id']}
 
+
+
 *** Test Cases ***
 
-Login to the system 
-    [Documentation]    Login to the system
+Verify login to the system with valid credentails
+    [Documentation]    Verify login to the system with valid credentails
     Create Session    Session   ${BASE_URL}
     ${headers}=    Create Dictionary    Accept=application/json
     ${payload}=    Create Dictionary    email=${email}    password=${password}
@@ -66,13 +68,34 @@ Login to the system
     Should Be Equal    ${user_data['user']['lastName']}    Kodikara
     Should Be Equal    ${user_data['user']['email']}    ${email}    ignore_case=True
 
+
+Login to the system with invalid credentails
+    [Documentation]    Login to the system with invalid credentails
+    Create Session    Session   ${BASE_URL}    verify=True
+    ${headers}=    Create Dictionary    Accept=application/json
+    ${payload}=    Create Dictionary    email=${email}    password=invalid_password
+    ${response}=    POST On Session  Session   ${login_endpoint}   headers=${headers}   json=${payload}    expected_status=ANY
+    Should Be Equal As Numbers    ${response.status_code}    401
+    Should Be Equal As Strings    ${response.reason}    Unauthorized
+
+
+Login to the system with empty credentails
+    [Documentation]    Login to the system with empty credentails
+    Create Session    Session   ${BASE_URL}    verify=True
+    ${headers}=    Create Dictionary    Accept=application/json
+    ${payload}=    Create Dictionary    email=   password=
+    ${response}=    POST On Session  Session   ${login_endpoint}   headers=${headers}   json=${payload}    expected_status=ANY
+    Should Be Equal As Numbers    ${response.status_code}    401
+    Should Be Equal As Strings    ${response.reason}    Unauthorized
+
+
 Add a new user with random data 
     [Documentation]    Add a new user with random data
     ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
     ${firstName_new_user}=    Set Variable    Janesh${random_number}
     ${lastName_new_user}=    Set Variable    Kodikara${random_number}
     ${email_new_user}=    Set Variable    ${firstName_new_user}.${lastName_new_user}@${domain}
-     ${payload_add_user}=    Create Dictionary    
+    ${payload_add_user}=    Create Dictionary    
      ...    firstName=${firstName_new_user}  
      ...    lastName=${lastName_new_user}    
      ...    email=${email_new_user} 
@@ -97,6 +120,7 @@ Add a new user with random data
     Should Not Be Empty    ${user_data}[token]
     Dictionary Should Not Contain Key    ${user_data}    password    
     Should Not Be Empty    ${user_data['user']['_id']}
+
 
 
 Add a new user with login keyword    
@@ -126,15 +150,3 @@ Add a new user with login keyword
     Dictionary Should Not Contain Key    ${user_data}    password    
     Should Not Be Empty    ${user_data['user']['_id']}
 
-
-Delete a user
-    [Documentation]    Delete a user
-    ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
-    ${firstName_new_user}=    Set Variable    Janesh${random_number}
-    ${lastName_new_user}=    Set Variable    Kodikara${random_number}
-    ${email_new_user}=    Set Variable    ${firstName_new_user}.${lastName_new_user}@${domain}
-    ${token}=    Login To The System   ${email}   ${password}
-    ${_id}=    Crearte a new user   ${firstName_new_user}   ${lastName_new_user}   ${email_new_user}   ${password}   ${token}
-    ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
-    ${response}=    DELETE On Session  Session   /users/${_id}   headers=${headers}
-    Should Be Equal As Numbers    ${response.status_code}    200

@@ -4,8 +4,6 @@ Library    Collections
 Library    ../../libraries/ContactLibrary.py
 Variables    ../../resources/variables.py
 
-Resource    users-test.robot
-
 *** Variables ***
 ${BASE_URL}    ${API_URL}
 ${login_endpoint}    /users/login
@@ -93,6 +91,26 @@ Create a new contact with random data
     ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}    ${email}    ${password}    ${token}
 
 
+Get contact detais 
+    [Documentation]    Get contact details
+    ${token}=    Login To The System    ${email}    ${password}
+    ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
+    ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
+    ${firstName_new_contact}=    Set Variable    Janesh${random_number}
+    ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
+    ${email_new_contact}=    Set Variable    ${firstName_new_contact}.${lastName_new_contact}@${domain}
+    ${token}=    Login To The System    ${email}    ${password}
+    ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}    ${email_new_contact}    ${password}    ${token}
+    ${response}=    GET On Session  Session   /contacts/${id}   headers=${headers}
+    Should Be Equal As Numbers    ${response.status_code}    200
+    Log To Console    message: ${response.json()}
+    ${user_data}=    Set Variable    ${response.json()}
+    Should Be Equal As Strings    ${user_data['firstName']}   ${firstName_new_contact}
+    Should Be Equal As Strings    ${user_data['lastName']}   ${lastName_new_contact}
+    Should Be Equal As Strings   ${user_data['email']}   ${email_new_contact}   ignore_case=True
+
+
+
 Delete a contact
     [Documentation]    Delete a contact
     ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
@@ -104,4 +122,8 @@ Delete a contact
     ${response}=    DELETE On Session  Session   /contacts/${id}   headers=${headers}
     Should Be Equal As Numbers    ${response.status_code}    200
     Should Be Equal As Strings    ${response.reason}    OK
+    ${response}=    GET On Session  Session   /contacts/${id}   headers=${headers}    expected_status=ANY
+    Should Be Equal As Numbers    ${response.status_code}    404
+    Should Be Equal As Strings    ${response.reason}    Not Found
+
     
