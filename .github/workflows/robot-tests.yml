@@ -1,4 +1,8 @@
-name: Selenium Tests
+name: API Tests Workflow
+# This workflow is triggered on push to the main branch and manually via workflow_dispatch
+# It sets up a Python environment, installs dependencies, and runs Robot Framework tests
+# The workflow is designed to run on Ubuntu and uses the latest version of Python 3.x
+# The tests are located in the 'tests/api' directory and the results are saved in the 'results' directory
 
 on: 
   push:
