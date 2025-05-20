@@ -52,6 +52,37 @@ Create a new contact
     [RETURN]    ${user_data['_id']}
 
 
+*** Keywords ***
+Generate Random Contact Payload
+    [Documentation]    Generates a contact payload using Faker and returns a dictionary
+    ${firstName}=    faker.First Name
+    ${lastName}=    faker.Last Name
+    ${email}=    faker.Email
+    ${birthdate}=    faker.Date Of Birth
+    ${birthdate}=    Convert To String    ${birthdate}
+    ${phone}=     Generate Random String    10    [NUMBERS]
+    ${street1}=    faker.Street Address
+    ${street2}=    faker.Secondary Address
+    ${city}=    faker.City
+    ${stateProvince}=    faker.State
+    ${postalCode}=    faker.Postal Code
+    ${country}=    faker.Country
+
+    ${payload}=    Create Dictionary
+    ...    firstName=${firstName}
+    ...    lastName=${lastName}
+    ...    birthdate=${birthdate}
+    ...    email=${email}
+    ...    phone=${phone}
+    ...    street1=${street1}
+    ...    street2=${street2}
+    ...    city=${city}
+    ...    stateProvince=${stateProvince}
+    ...    postalCode=${postalCode}
+    ...    country=${country}
+
+    [Return]    ${payload}
+
 
 *** Test Cases ***
 
@@ -89,7 +120,6 @@ Create a new contact
     Should Be Equal    ${user_data['birthdate']}    ${payload}[birthdate] 
 
 
-
 Create a new contact with random data from data faker 
     [Documentation]    Create a new contact with random data from data faker
     ${token}=    Login To The System    ${email}    ${password}
@@ -122,23 +152,45 @@ Create a new contact with random data from data faker
     ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}
     Should Be Equal As Numbers    ${response.status_code}    201
     ${user_data}=    Set Variable    ${response.json()}
-    Log To Console    ${response.json()}
-    Should Be Equal    ${user_data['firstName']}    ${payload}[firstName]
-    Should Be Equal    ${user_data['lastName']}    ${payload}[lastName]
-    Should Be Equal    ${user_data['email']}    ${payload}[email]    ignore_case=True
-    Should Be Equal    ${user_data['phone']}    ${payload}[phone]
-    Should Be Equal    ${user_data['street1']}    ${payload}[street1]       
-    Should Be Equal    ${user_data['street2']}    ${payload}[street2]
-    Should Be Equal    ${user_data['city']}    ${payload}[city]
-    Should Be Equal    ${user_data['stateProvince']}    ${payload}[stateProvince]
-    Should Be Equal    ${user_data['postalCode']}    ${payload}[postalCode]
-    Should Be Equal    ${user_data['country']}    ${payload}[country]
-    Should Be Equal    ${user_data['birthdate']}    ${payload}[birthdate]     
+    # Validate response fields
+    FOR    ${field}    IN    firstName    lastName    email    phone    street1    street2    city    stateProvince    postalCode    country    birthdate
+        Should Be Equal    ${user_data['${field}']}    ${payload}[${field}]    ignore_case=${field}=='email'
+    END 
 
 
+Create a new contact with random payload
+    [Documentation]    Create a new contact with random data from data faker
+    ${token}=    Login To The System    ${email}    ${password}
+    ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
+    
+    ${payload}=    Generate Random Contact Payload
+    Log To Console    ${payload}
 
-Create a new contact with random data 
-    [Documentation]    Create a new contact with random data
+    ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}
+    Should Be Equal As Numbers    ${response.status_code}    201
+    ${user_data}=    Set Variable    ${response.json()}
+
+    ${fields}=    Create List    firstName    lastName    email    phone    street1    street2    city    stateProvince    postalCode    country    birthdate
+
+    # Validate response fields
+    FOR    ${field}    IN    @{fields}
+        Should Be Equal    ${user_data['${field}']}    ${payload}[${field}]    ignore_case=${field}=='email'
+    END 
+
+Create a new contact after logout
+    [Documentation]    Create a new contact after logout
+    ${token}=    Login To The System    ${email}    ${password}
+    ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
+    ${payload}=    Generate Random Contact Payload
+    Log To Console    ${payload}
+    Logout user   ${token}
+    ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}   expected_status=401
+    Should Be Equal As Numbers    ${response.status_code}    401
+    Should Be Equal As Strings    ${response.reason}   Unauthorized
+
+
+Create a new contact with random 
+    [Documentation]    Create a new contact with random
     ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
     ${firstName_new_contact}=    Set Variable    Janesh${random_number}
     ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
@@ -211,20 +263,23 @@ Partial update of a contact details
 Get contact detais 
     [Documentation]    Get contact details
     ${token}=    Login To The System    ${email}    ${password}
+
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
-    ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
-    ${firstName_new_contact}=    Set Variable    Janesh${random_number}
-    ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
-    ${email_new_contact}=    Set Variable    ${firstName_new_contact}.${lastName_new_contact}@${domain}
-    ${token}=    Login To The System    ${email}    ${password}
-    ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}    ${email_new_contact}    ${token}
-    ${response}=    GET On Session  Session   /contacts/${id}   headers=${headers}
-    Should Be Equal As Numbers    ${response.status_code}    200
-    Log To Console    message: ${response.json()}
+    ${payload}=    Generate Random Contact Payload
+
+    ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}
     ${user_data}=    Set Variable    ${response.json()}
-    Should Be Equal As Strings    ${user_data['firstName']}   ${firstName_new_contact}
-    Should Be Equal As Strings    ${user_data['lastName']}   ${lastName_new_contact}
-    Should Be Equal As Strings   ${user_data['email']}   ${email_new_contact}   ignore_case=True
+   
+
+    ${response}=    GET On Session  Session   /contacts/${user_data['_id']}   headers=${headers}
+    Should Be Equal As Numbers    ${response.status_code}    200
+    ${user_data}=    Set Variable    ${response.json()}
+
+    # Validate response fields
+    ${fields}=    Create List    firstName    lastName    email    phone    street1    street2    city    stateProvince    postalCode    country    birthdate
+    FOR    ${field}    IN    @{fields}
+        Should Be Equal    ${user_data['${field}']}    ${payload}[${field}]    ignore_case=${field}=='email'
+    END 
 
 
 
