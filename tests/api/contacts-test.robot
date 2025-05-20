@@ -40,6 +40,7 @@ Create a new contact
      ...    firstName=${firstName}  
      ...    lastName=${lastName}    
      ...    email=${email} 
+     ...    birthdate=1990-01-01
      ...    phone=0712345678
      ...    street1=123 Main St
      ...    street2=Suite 100
@@ -85,6 +86,22 @@ Generate Random Contact Payload
 
 
 *** Test Cases ***
+
+
+Verify structure of the new contact response structure
+    [Documentation]    Verify structure of the new contact response structure
+    ${token}=    Login To The System    ${email}    ${password}
+    ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
+    ${payload}=    Generate Random Contact Payload
+    Log To Console    ${payload}
+    ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}
+    Should Be Equal As Numbers    ${response.status_code}    201
+    ${response_data}=    Set Variable    ${response.json()}
+    ${expected_fields}=    Create List    _id    firstName    lastName    birthdate    email    phone
+    ...    street1    street2    city    stateProvince    postalCode    country    owner    __v
+    FOR    ${field}    IN    @{expected_fields}
+        Dictionary Should Contain Key    ${response_data}    ${field}
+    END
 
 
 Create a new contact 
@@ -253,10 +270,18 @@ Partial update of a contact details
      ...   lastName=${lastName_new_contact}   
     ${response}=    PATCH On Session  Session   /contacts/${id}   json=${payload}  headers=${headers}
     Should Be Equal As Numbers    ${response.status_code}    200
-    ${user_data}=    Set Variable    ${response.json()}
-    Should Be Equal    ${user_data['firstName']}    ${payload}[firstName]   
-    Should Be Equal    ${user_data['lastName']}    ${payload}[lastName]
-    Should Be Equal    ${user_data['email']}    ${email}    ignore_case=True
+    ${response_data}=    Set Variable    ${response.json()}
+    Should Be Equal    ${response_data['firstName']}    ${payload}[firstName]   
+    Should Be Equal    ${response_data['lastName']}    ${payload}[lastName]
+    Should Be Equal    ${response_data['email']}    ${email}    ignore_case=True
+
+    Log To Console     ${response_data}
+    # Validate response fields
+    ${expected_fields}=    Create List    _id    firstName    lastName    birthdate    email    phone
+    ...    street1    street2    city    stateProvince    postalCode    country    owner    __v
+    FOR    ${field}    IN    @{expected_fields}
+        Dictionary Should Contain Key    ${response_data}    ${field}
+    END
 
 
 
