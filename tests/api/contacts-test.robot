@@ -5,6 +5,9 @@ Library    Collections
 Library    ../../libraries/ContactLibrary.py
 Library    String
 Variables    ../../resources/variables.py
+Test Setup    Login To The System    ${email}    ${password}
+Test Teardown  
+...    Logout user    ${token}
 
 *** Variables ***
 ${BASE_URL}    ${API_URL}
@@ -12,6 +15,8 @@ ${login_endpoint}    /users/login
 ${email}    janesh@test.com
 ${password}    Test-4321   
 ${domain}    test.com
+${token}    ${None}
+${contact_id}    ${None}
 
 
 *** Keywords ***
@@ -23,8 +28,8 @@ Login To The System
     ${payload}=    Create Dictionary    email=${email}    password=${password}
     ${response}=    POST On Session  Session   ${login_endpoint}   headers=${headers}   json=${payload}
     ${user_data}=    Set Variable    ${response.json()}
-    ${token}=    Set Variable    ${user_data}[token]
-    [RETURN]    ${token}
+    ${auth_token}=    Set Variable    ${response.json()['token']}
+    Set Test Variable    ${token}    ${auth_token}
 
 Logout user
     [Documentation]    Logout user
@@ -50,6 +55,7 @@ Create a new contact
      ...    country=Sri Lanka
     ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}    
     ${user_data}=    Set Variable    ${response.json()}
+    Set Test Variable    ${contact_id}    ${user_data['_id']}
     [RETURN]    ${user_data['_id']}
 
 
@@ -90,7 +96,7 @@ Generate Random Contact Payload
 
 Verify structure of the new contact response structure
     [Documentation]    Verify structure of the new contact response structure
-    ${token}=    Login To The System    ${email}    ${password}
+    # ${token}=    Login To The System    ${email}    ${password}
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${payload}=    Generate Random Contact Payload
     Log To Console    ${payload}
@@ -106,7 +112,6 @@ Verify structure of the new contact response structure
 
 Create a new contact 
     [Documentation]    Create a new contact
-    ${token}=    Login To The System    ${email}    ${password}
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${payload}=    Create Dictionary    
      ...    firstName=Janesh  
@@ -139,7 +144,6 @@ Create a new contact
 
 Create a new contact with random data from data faker 
     [Documentation]    Create a new contact with random data from data faker
-    ${token}=    Login To The System    ${email}    ${password}
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${firstName}=    faker.First Name
     ${lastName}=     faker.Last Name
@@ -177,7 +181,6 @@ Create a new contact with random data from data faker
 
 Create a new contact with random payload
     [Documentation]    Create a new contact with random data from data faker
-    ${token}=    Login To The System    ${email}    ${password}
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     
     ${payload}=    Generate Random Contact Payload
@@ -196,7 +199,6 @@ Create a new contact with random payload
 
 Create a new contact after logout
     [Documentation]    Create a new contact after logout
-    ${token}=    Login To The System    ${email}    ${password}
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${payload}=    Generate Random Contact Payload
     Log To Console    ${payload}
@@ -211,7 +213,6 @@ Create a new contact with random
     ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
     ${firstName_new_contact}=    Set Variable    Janesh${random_number}
     ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
-    ${token}=    Login To The System    ${email}    ${password}
     ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}    ${email}    ${token}
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${response}=    GET On Session  Session   /contacts/${id}   headers=${headers}
@@ -228,7 +229,6 @@ Update contact details
     ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
     ${firstName_new_contact}=    Set Variable    Janesh${random_number}
     ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
-    ${token}=    Login To The System    ${email}    ${password}
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}   ${email}   ${token}
     ${payload}=    Create Dictionary    
@@ -262,7 +262,6 @@ Partial update of a contact details
     ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
     ${firstName_new_contact}=    Set Variable    Janesh${random_number}
     ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
-    ${token}=    Login To The System    ${email}    ${password}
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}   ${email}   ${token}
     ${payload}=    Create Dictionary    
@@ -287,7 +286,6 @@ Partial update of a contact details
 
 Get contact detais 
     [Documentation]    Get contact details
-    ${token}=    Login To The System    ${email}    ${password}
 
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${payload}=    Generate Random Contact Payload
@@ -307,13 +305,11 @@ Get contact detais
     END 
 
 
-
 Delete a contact
     [Documentation]    Delete a contact
     ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
     ${firstName_new_contact}=    Set Variable    Janesh${random_number}
     ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
-    ${token}=    Login To The System    ${email}    ${password}
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}    ${email}    ${token}
     ${response}=    DELETE On Session  Session   /contacts/${id}   headers=${headers}
