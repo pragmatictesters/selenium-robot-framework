@@ -3,7 +3,7 @@ Library    RequestsLibrary
 Library    Collections
 | Library | FakerLibrary | WITH NAME | faker
 Library    ../../libraries/ContactLibrary.py
-Library    ../../venv/lib/python3.13/site-packages/robot/libraries/String.py
+Library    String
 Variables    ../../resources/variables.py
 
 *** Variables ***
