@@ -1,10 +1,12 @@
 *** Settings ***
 Library    RequestsLibrary
+Library    ../../libraries/disable_warnings.py
 Library    Collections
 | Library | FakerLibrary | WITH NAME | faker
 Library    ../../libraries/ContactLibrary.py
 Library    String
 Variables    ../../resources/variables.py
+Suite Setup    disable_warnings
 Test Setup    Login To The System    ${email}    ${password}
 Test Teardown    Run Keywords    Delete a contact if exists    ${contact_id}    ${token}    AND    Logout user    ${token}
 
@@ -56,7 +58,7 @@ Create a new contact
     ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}    
     ${user_data}=    Set Variable    ${response.json()}
     Set Test Variable    ${contact_id}    ${user_data['_id']}
-    [RETURN]    ${user_data['_id']}
+    RETURN    ${user_data['_id']}
 
 Create a new contact with randon data
     [Documentation]    Create a new user with randon data
@@ -65,7 +67,7 @@ Create a new contact with randon data
     ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}    
     ${user_data}=    Set Variable    ${response.json()}
     Set Test Variable    ${contact_id}    ${user_data['_id']}
-    [RETURN]    ${user_data['_id']}
+    RETURN    ${user_data['_id']}
 
 Generate Random Contact Payload
     [Documentation]    Generates a contact payload using Faker and returns a dictionary
@@ -95,7 +97,7 @@ Generate Random Contact Payload
     ...    postalCode=${postalCode}
     ...    country=${country}
 
-    [Return]    ${payload}
+    RETURN    ${payload}
 
 Delete a contact if exists
     [Arguments]    ${contact_id}    ${token}
