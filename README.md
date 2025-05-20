@@ -1,5 +1,7 @@
 # Robot Framework Automation Examples for The Internet Herokuapp
 
+[![API Tests Workflow](https://github.com/pragmatictesters/selenium-robot-framework/actions/workflows/robot-tests.yml/badge.svg)](https://github.com/pragmatictesters/selenium-robot-framework/actions/workflows/robot-tests.yml)
+
 This repository contains automation examples using the **Robot Framework** with **SeleniumLibrary** for interacting with components on [The Internet Herokuapp](https://the-internet.herokuapp.com/). It demonstrates real-world automation scenarios including working with alerts, context menus, dynamic elements, login flows, and more.
 
 ---
