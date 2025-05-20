@@ -1,7 +1,9 @@
 *** Settings ***
 Library    RequestsLibrary
 Library    Collections
+| Library | FakerLibrary | WITH NAME | faker
 Library    ../../libraries/ContactLibrary.py
+Library    ../../venv/lib/python3.13/site-packages/robot/libraries/String.py
 Variables    ../../resources/variables.py
 
 *** Variables ***
@@ -24,6 +26,11 @@ Login To The System
     ${token}=    Set Variable    ${user_data}[token]
     [RETURN]    ${token}
 
+Logout user
+    [Documentation]    Logout user
+    [Arguments]    ${token}
+    ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
+    ${response}=    POST On Session  Session   /users/logout   headers=${headers}
 
 Create a new contact
     [Arguments]    ${firstName}    ${lastName}    ${email}    ${token}
@@ -82,6 +89,54 @@ Create a new contact
     Should Be Equal    ${user_data['birthdate']}    ${payload}[birthdate] 
 
 
+
+Create a new contact with random data from data faker 
+    [Documentation]    Create a new contact with random data from data faker
+    ${token}=    Login To The System    ${email}    ${password}
+    ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
+    ${firstName}=    faker.First Name
+    ${lastName}=     faker.Last Name
+    ${email}=        faker.Email
+    ${birthdate}=    faker.Date Of Birth
+    ${birthdate}=    Convert To String    ${birthdate}
+    ${phone}=        Generate Random String    length=10    chars=[NUMBERS]
+    ${street1}=      faker.Street Address
+    ${street2}=      faker.Secondary Address
+    ${city}=         faker.City
+    ${stateProvince}=    faker.State
+    ${postalCode}=   faker.Postal Code
+    ${country}=      faker.Country
+    ${payload}=    Create Dictionary    
+     ...    firstName=${firstName}
+     ...    lastName=${lastName}
+     ...    birthdate=${birthdate}
+     ...    email=${email}
+     ...    phone=${phone}
+     ...    street1=${street1}
+     ...    street2=${street2}
+     ...    city=${city}
+     ...    stateProvince=${stateProvince}
+     ...    postalCode=${postalCode}
+     ...    country=${country}
+    Log To Console    ${payload}
+    ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}
+    Should Be Equal As Numbers    ${response.status_code}    201
+    ${user_data}=    Set Variable    ${response.json()}
+    Log To Console    ${response.json()}
+    Should Be Equal    ${user_data['firstName']}    ${payload}[firstName]
+    Should Be Equal    ${user_data['lastName']}    ${payload}[lastName]
+    Should Be Equal    ${user_data['email']}    ${payload}[email]    ignore_case=True
+    Should Be Equal    ${user_data['phone']}    ${payload}[phone]
+    Should Be Equal    ${user_data['street1']}    ${payload}[street1]       
+    Should Be Equal    ${user_data['street2']}    ${payload}[street2]
+    Should Be Equal    ${user_data['city']}    ${payload}[city]
+    Should Be Equal    ${user_data['stateProvince']}    ${payload}[stateProvince]
+    Should Be Equal    ${user_data['postalCode']}    ${payload}[postalCode]
+    Should Be Equal    ${user_data['country']}    ${payload}[country]
+    Should Be Equal    ${user_data['birthdate']}    ${payload}[birthdate]     
+
+
+
 Create a new contact with random data 
     [Documentation]    Create a new contact with random data
     ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
@@ -89,6 +144,14 @@ Create a new contact with random data
     ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
     ${token}=    Login To The System    ${email}    ${password}
     ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}    ${email}    ${token}
+    ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
+    ${response}=    GET On Session  Session   /contacts/${id}   headers=${headers}
+    Should Be Equal As Numbers    ${response.status_code}    200
+    Log To Console    message: ${response.json()}
+    ${user_data}=    Set Variable    ${response.json()}
+    Should Be Equal As Strings    ${user_data['firstName']}   ${firstName_new_contact}
+    Should Be Equal As Strings    ${user_data['lastName']}   ${lastName_new_contact}
+
 
 
 Update contact details 
