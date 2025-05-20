@@ -1,28 +1,20 @@
 *** Settings ***
-Library    RequestsLibrary
-Library    ../../libraries/disable_warnings.py
-Library    Collections
-| Library | FakerLibrary | WITH NAME | faker
-Library    ../../libraries/ContactLibrary.py
-Library    String
+Library           RequestsLibrary
+Library           Collections
+Library           String
+Library           FakerLibrary    WITH NAME    faker
+Library           ../../libraries/ContactLibrary.py
+Library           ../../libraries/disable_warnings.py
 
-Variables    ../../resources/variables/variables_api.py
+Variables         ../../resources/variables/variables_api.py
+Resource          ../../resources/keywords/api_keywords.robot
 
-Resource    ../../resources/keywords/api_keywords.robot
-
-Suite Setup    disable_warnings
-Test Setup    Login To The System    ${email}    ${password}
-Test Teardown    Run Keywords    Delete a contact if exists    ${contact_id}    ${token}    AND    Logout user    ${token}
-
-
-*** Variables ***
-# ${BASE_URL}    ${API_URL}
-# ${login_endpoint}    /users/login
-# ${email}    janesh@test.com
-# ${password}    Test-4321   
-# ${domain}    test.com
-# ${token}    ${None}
-# ${contact_id}    ${None}
+Suite Setup       disable_warnings
+Test Setup        Login To The System    ${email}    ${password}
+Test Teardown     Run Keywords
+...               Delete a contact if exists    ${contact_id}    ${token}
+...               AND
+...               Logout user                ${token}
 
 
 *** Test Cases ***
@@ -30,7 +22,6 @@ Test Teardown    Run Keywords    Delete a contact if exists    ${contact_id}    
 
 Verify structure of the new contact response structure
     [Documentation]    Verify structure of the new contact response structure
-    # ${token}=    Login To The System    ${email}    ${password}
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${payload}=    Generate Random Contact Payload
     # Log To Console    ${payload}
