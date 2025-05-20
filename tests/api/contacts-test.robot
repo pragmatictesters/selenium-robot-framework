@@ -6,8 +6,8 @@ Library    ../../libraries/ContactLibrary.py
 Library    String
 Variables    ../../resources/variables.py
 Test Setup    Login To The System    ${email}    ${password}
-Test Teardown  
-...    Logout user    ${token}
+Test Teardown    Run Keywords    Delete a contact if exists    ${contact_id}    ${token}    AND    Logout user    ${token}
+
 
 *** Variables ***
 ${BASE_URL}    ${API_URL}
@@ -58,8 +58,15 @@ Create a new contact
     Set Test Variable    ${contact_id}    ${user_data['_id']}
     [RETURN]    ${user_data['_id']}
 
+Create a new contact with randon data
+    [Documentation]    Create a new user with randon data
+    ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
+    ${payload}=    Generate Random Contact Payload
+    ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}    
+    ${user_data}=    Set Variable    ${response.json()}
+    Set Test Variable    ${contact_id}    ${user_data['_id']}
+    [RETURN]    ${user_data['_id']}
 
-*** Keywords ***
 Generate Random Contact Payload
     [Documentation]    Generates a contact payload using Faker and returns a dictionary
     ${firstName}=    faker.First Name
@@ -90,6 +97,14 @@ Generate Random Contact Payload
 
     [Return]    ${payload}
 
+Delete a contact if exists
+    [Arguments]    ${contact_id}    ${token}
+    [Documentation]    Delete a contact if it exists
+    ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
+    ${response}=    GET On Session    Session    /contacts/${contact_id}    headers=${headers}    expected_status=ANY
+    Run Keyword If    '${response.status_code}' == '200'    DELETE On Session    Session    /contacts/${contact_id}    headers=${headers}
+   
+
 
 *** Test Cases ***
 
@@ -103,6 +118,7 @@ Verify structure of the new contact response structure
     ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}
     Should Be Equal As Numbers    ${response.status_code}    201
     ${response_data}=    Set Variable    ${response.json()}
+    Set Test Variable    ${contact_id}    ${response_data['_id']}
     ${expected_fields}=    Create List    _id    firstName    lastName    birthdate    email    phone
     ...    street1    street2    city    stateProvince    postalCode    country    owner    __v
     FOR    ${field}    IN    @{expected_fields}
@@ -110,8 +126,8 @@ Verify structure of the new contact response structure
     END
 
 
-Create a new contact 
-    [Documentation]    Create a new contact
+Verify creating a new contact with valid data
+    [Documentation]    Verify creating a new contact with valid data
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${payload}=    Create Dictionary    
      ...    firstName=Janesh  
@@ -199,6 +215,7 @@ Create a new contact with random payload
 
 Create a new contact after logout
     [Documentation]    Create a new contact after logout
+    [Teardown]    No Operation
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${payload}=    Generate Random Contact Payload
     Log To Console    ${payload}
@@ -290,10 +307,11 @@ Get contact detais
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
     ${payload}=    Generate Random Contact Payload
 
+    #Create a new contact
     ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}
     ${user_data}=    Set Variable    ${response.json()}
    
-
+    #Get contact details
     ${response}=    GET On Session  Session   /contacts/${user_data['_id']}   headers=${headers}
     Should Be Equal As Numbers    ${response.status_code}    200
     ${user_data}=    Set Variable    ${response.json()}
