@@ -15,6 +15,10 @@ Validate Response Status
     [Arguments]    ${response}    ${expected_status}
     Should Be Equal As Numbers    ${response.status_code}    ${expected_status}
 
+Validate Response message
+    [Arguments]    ${response}    ${expected_message}
+    Should Be Equal As Strings    ${response.reason}    ${expected_message}
+
 Login To The System
     [Arguments]    ${email}    ${password}
     [Documentation]    Login to the system

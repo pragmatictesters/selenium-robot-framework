@@ -39,18 +39,7 @@ Verify structure of the new contact response structure
 Verify creating a new contact with valid data
     [Documentation]    Verify creating a new contact with valid data
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
-    ${payload}=    Create Dictionary    
-     ...    firstName=Janesh  
-     ...    lastName=Kodikara
-     ...    birthdate=1990-01-01
-     ...    email=${email} 
-     ...    phone=0712345678
-     ...    street1=123 Main St
-     ...    street2=Suite 100
-     ...    city=Colombo
-     ...    stateProvince=Western
-     ...    postalCode=12345
-     ...    country=Sri Lanka
+    ${payload}=    Generate Random Contact Payload
     ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}
     Validate Response Status    ${response}    201
     ${user_data}=    Set Variable    ${response.json()}
@@ -71,30 +60,7 @@ Verify creating a new contact with valid data
 Create a new contact with random data from data faker 
     [Documentation]    Create a new contact with random data from data faker
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
-    ${firstName}=    faker.First Name
-    ${lastName}=     faker.Last Name
-    ${email}=        faker.Email
-    ${birthdate}=    faker.Date Of Birth
-    ${birthdate}=    Convert To String    ${birthdate}
-    ${phone}=        Generate Random String    length=10    chars=[NUMBERS]
-    ${street1}=      faker.Street Address
-    ${street2}=      faker.Secondary Address
-    ${city}=         faker.City
-    ${stateProvince}=    faker.State
-    ${postalCode}=   faker.Postal Code
-    ${country}=      faker.Country
-    ${payload}=    Create Dictionary    
-     ...    firstName=${firstName}
-     ...    lastName=${lastName}
-     ...    birthdate=${birthdate}
-     ...    email=${email}
-     ...    phone=${phone}
-     ...    street1=${street1}
-     ...    street2=${street2}
-     ...    city=${city}
-     ...    stateProvince=${stateProvince}
-     ...    postalCode=${postalCode}
-     ...    country=${country}
+    ${payload}=    Generate Random Contact Payload
     # Log To Console    ${payload}
     ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}
     Validate Response Status    ${response}    201
@@ -132,7 +98,7 @@ Create a new contact after logout
     Logout user   ${token}
     ${response}=    POST On Session  Session   /contacts   json=${payload}  headers=${headers}   expected_status=401
     Validate Response Status    ${response}    401
-    Should Be Equal As Strings    ${response.reason}   Unauthorized
+    Validate Response message    ${response}    Unauthorized
 
 
 Create a new contact with random 
@@ -153,23 +119,9 @@ Create a new contact with random
 
 Update contact details 
     [Documentation]    Update contact details
-    ${random_number}=    Evaluate    random.randint(10000, 10000000)    modules=random
-    ${firstName_new_contact}=    Set Variable    Janesh${random_number}
-    ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
-    ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}   ${email}   ${token}
-    ${payload}=    Create Dictionary    
-     ...   firstName=${firstName_new_contact}  
-     ...   lastName=${lastName_new_contact}    
-     ...   email=${email} 
-     ...   phone=0712345678
-     ...   street1=123 Main St
-     ...   street2=Suite 100
-     ...   city=Colombo
-     ...   stateProvince=Western
-     ...   postalCode=12345
-     ...   country=Sri Lanka
-     ...   birthdate=1990-01-01
+    ${id}=    Create a new contact with randon data
+    ${payload}=    Generate Random Contact Payload
     ${response}=    PUT On Session  Session   /contacts/${id}   json=${payload}  headers=${headers}
     Validate Response Status    ${response}    200
     ${user_data}=    Set Variable    ${response.json()}
@@ -190,16 +142,30 @@ Partial update of a contact details
     ${firstName_new_contact}=    Set Variable    Janesh${random_number}
     ${lastName_new_contact}=    Set Variable    Kodikara${random_number}
     ${headers}=    Create Dictionary    Accept=application/json    Authorization=Bearer ${token}
-    ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}   ${email}   ${token}
-    ${payload}=    Create Dictionary    
+   
+    ${payload_initial}=    Generate Random Contact Payload
+    ${response}=    POST On Session  Session   /contacts   json=${payload_initial}  headers=${headers}    
+    ${user_data}=    Set Variable    ${response.json()}
+    ${id}=    Set Variable    ${user_data['_id']}
+
+    ${payload_new}=    Create Dictionary    
      ...   firstName=${firstName_new_contact}  
      ...   lastName=${lastName_new_contact}   
-    ${response}=    PATCH On Session  Session   /contacts/${id}   json=${payload}  headers=${headers}
+    ${response}=    PATCH On Session  Session   /contacts/${id}   json=${payload_new}  headers=${headers}
     Validate Response Status    ${response}    200
     ${response_data}=    Set Variable    ${response.json()}
-    Should Be Equal    ${response_data['firstName']}    ${payload}[firstName]   
-    Should Be Equal    ${response_data['lastName']}    ${payload}[lastName]
-    Should Be Equal    ${response_data['email']}    ${email}    ignore_case=True
+    Should Be Equal    ${response_data['firstName']}    ${payload_new}[firstName]   
+    Should Be Equal    ${response_data['lastName']}    ${payload_new}[lastName]
+    Should Be Equal    ${response_data['email']}    ${payload_initial}[email]    ignore_case=True
+    Should Be Equal    ${response_data['phone']}    ${payload_initial}[phone]
+    Should Be Equal    ${response_data['street1']}    ${payload_initial}[street1]
+    Should Be Equal    ${response_data['street2']}    ${payload_initial}[street2]
+    Should Be Equal    ${response_data['city']}    ${payload_initial}[city]
+    Should Be Equal    ${response_data['stateProvince']}    ${payload_initial}[stateProvince]
+    Should Be Equal    ${response_data['postalCode']}    ${payload_initial}[postalCode]
+    Should Be Equal    ${response_data['country']}    ${payload_initial}[country]
+    Should Be Equal    ${response_data['birthdate']}    ${payload_initial}[birthdate]
+
 
     # Log To Console     ${response_data}
     # Validate response fields
@@ -242,7 +208,7 @@ Delete a contact
     ${id}=    Create a new contact    ${firstName_new_contact}    ${lastName_new_contact}    ${email}    ${token}
     ${response}=    DELETE On Session  Session   /contacts/${id}   headers=${headers}
     Validate Response Status    ${response}    200
-    Should Be Equal As Strings    ${response.reason}    OK
+    Validate Response message    ${response}    OK
     ${response}=    GET On Session  Session   /contacts/${id}   headers=${headers}    expected_status=ANY
     Validate Response Status    ${response}    404
-    Should Be Equal As Strings    ${response.reason}    Not Found
+    Validate Response message    ${response}    Not Found
