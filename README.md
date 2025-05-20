@@ -4,22 +4,29 @@
 
 This repository contains automation examples using the **Robot Framework** with **SeleniumLibrary** for interacting with components on [The Internet Herokuapp](https://the-internet.herokuapp.com/). It demonstrates real-world automation scenarios including working with alerts, context menus, dynamic elements, login flows, and more.
 
+
 ---
-
-## 📁 Folder Structure
-
 ```
-robot-tests/
+ROBOT-DEMO/
 │
-├── tests/                 # Test case files (.robot)
-├── resources/             # Page objects, keywords, and images
-├── test_data/             # Input data or supporting files
-├── results/               # Test execution reports and logs
-├── .gitignore
-└── README.md
+├── .github/               # GitHub-related workflows or configs
+├── drivers/               # Browser drivers (e.g., chromedriver)
+│   └── chromedriver
+├── libraries/             # Custom Python or Robot libraries
+├── resources/             # Resource files (keywords, variables)
+├── test-data/             # Test input files (e.g., images, CSVs)
+│   └── mandella-worldcup.jpeg
+├── tests/                 # Robot Framework test cases
+│   ├── api/               # API test cases
+│   ├── examples/          # Sample or reference test cases
+│   └── selenium/          # UI tests using Selenium
+├── .gitignore             # Git ignore rules
+├── log.html               # Robot test execution log
+├── output.xml             # Robot test execution raw output
+├── report.html            # Robot test execution summary report
+└── README.md              # Project documentation
 ```
-
----
+----
 
 ## 🛠️ Setup Instructions
 
@@ -30,8 +37,14 @@ You can download Python from [python.org](https://www.python.org/downloads/). Ma
 ### 2. Install Robot Framework and SeleniumLibrary
 
 ```bash
+python -m pip install --upgrade pip
+pip install setuptools                   # Required for FakerLibrary
 pip install robotframework
 pip install robotframework-seleniumlibrary
+pip install robotframework-requests
+pip install robotframework-faker
+pip install Faker
+
 ```
 
 ### 3. Install WebDriver (ChromeDriver)
@@ -41,16 +54,23 @@ Ensure Chrome is installed and download the corresponding **ChromeDriver** from:
 
 Place the driver in a folder that's in your system `PATH`.
 
-Alternatively, you can use `webdriver-manager`:
-
-```bash
-pip install webdriver-manager
-```
 
 ### 4. Install VS Code or PyCharm (Optional but recommended)
 
 - **VS Code**: Install the "Robot Framework Language Server" extension.
 
+Here’s a clean and clear update for the **VS Code setup section** in your `README.md`:
+
+---
+
+### 🧩 VS Code Setup
+
+Make sure to install the following extensions to enable full support for Robot Framework development:
+
+* ✅ [**Robot Framework Language Server**](https://marketplace.visualstudio.com/items?itemName=robocorp.robotframework-lsp) — Syntax highlighting, code completion, and Robot language support.
+* 🐍 [**Python**](https://marketplace.visualstudio.com/items?itemName=ms-python.python) — Required for running and debugging Python-based tools.
+* 🐞 [**Python Debugger (debugpy)**](https://marketplace.visualstudio.com/items?itemName=ms-python.debugpy) — Enables debugging Python code used in custom libraries.
+* 📏 [**Pylint**](https://marketplace.visualstudio.com/items?itemName=ms-python.pylint) — For linting Python files and maintaining code quality.
 
 ---
 
@@ -65,7 +85,7 @@ robot tests/
 ### Run a specific test suite
 
 ```bash
-robot tests/test_login.robot
+robot tests/selenium/test_login.robot
 ```
 
 ### Run with output directory
@@ -78,17 +98,42 @@ robot -d results tests/
 
 ## 🌐 Components Automated
 
-Examples cover components such as:
+You can revise the original section to reflect that your test automation suite now includes **API tests** in addition to Selenium-based **UI component tests**.
 
-- Add/Remove Elements
-- Alerts & Modal Dialogs
-- Context Menu
-- Login & Error Handling
-- Dynamic Controls
-- File Uploads
-- Frames & Windows
-- JavaScript Alerts
-- and more...
+Here’s the updated version:
+
+---
+
+## 🌐 Components Automated
+
+Our test suite includes both **UI** and **API** automation using **Selenium** and **Robot Framework** with **RequestsLibrary**. The automated components and features include:
+
+### 🖥️ UI Components (Selenium)
+
+* Add/Remove Elements
+* Alerts & Modal Dialogs
+* Context Menu
+* Login & Error Handling
+* Dynamic Controls
+* File Uploads
+* Frames & Windows
+* JavaScript Alerts
+* and more...
+
+### 🔗 API Components (Robot Framework)
+
+* User Login & Logout
+* Create Contact with Static & Random Data (Faker)
+* Validate Response Structure
+* Field-by-field Response Validation
+* Negative Testing (e.g., create after logout)
+
+These API tests use:
+
+* `RequestsLibrary` for HTTP interactions
+* `FakerLibrary` for generating random, realistic test data
+* Custom libraries and keywords for reusable components and test logic
+
 
 ---
 
@@ -112,9 +157,6 @@ All located inside the `results/` directory.
 
 ---
 
-## 📷 Screenshots & Assets
-
-All visual assets and test data are stored under `resources/` and `test_data/` directories.
 
 
 ---
