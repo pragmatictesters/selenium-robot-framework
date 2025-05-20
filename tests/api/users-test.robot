@@ -23,7 +23,7 @@ Login To The System
     ${response}=    POST On Session  Session   ${login_endpoint}   headers=${headers}   json=${payload}
     ${user_data}=    Set Variable    ${response.json()}
     ${token}=    Set Variable    ${user_data}[token]
-    [RETURN]    ${token}
+    RETURN    ${token}
 
 Crearte a new user
     [Arguments]    ${firstName}    ${lastName}    ${email}    ${password}    ${token}
@@ -36,7 +36,7 @@ Crearte a new user
      ...    password=${password}
     ${response}=    POST On Session  Session   /users   json=${payload}  headers=${headers}    
     ${user_data}=    Set Variable    ${response.json()}
-    [RETURN]    ${user_data['user']['_id']}
+    RETURN    ${user_data['user']['_id']}
 
 Crearte a new user with constact library
     [Arguments]    ${token}
@@ -47,7 +47,7 @@ Crearte a new user with constact library
     ${payload}=    ${random_contact}
     ${response}=    POST On Session  Session   /users   json=${payload}  headers=${headers}    
     ${user_data}=    Set Variable    ${response.json()}
-    [RETURN]    ${user_data['user']['_id']}
+    RETURN    ${user_data['user']['_id']}
 
 
 
