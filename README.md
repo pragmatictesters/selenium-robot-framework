@@ -2,6 +2,8 @@
 
 [![API Tests Workflow](https://github.com/pragmatictesters/selenium-robot-framework/actions/workflows/robot-tests.yml/badge.svg)](https://github.com/pragmatictesters/selenium-robot-framework/actions/workflows/robot-tests.yml)
 
+[![Run Robot Framework API Tests in Docker](https://github.com/pragmatictesters/selenium-robot-framework/actions/workflows/robot-api-tests-docker.yml/badge.svg)](https://github.com/pragmatictesters/selenium-robot-framework/actions/workflows/robot-api-tests-docker.yml)
+
 This repository contains automation examples using the **Robot Framework** with **SeleniumLibrary** for interacting with components on [The Internet Herokuapp](https://the-internet.herokuapp.com/). It demonstrates real-world automation scenarios including working with alerts, context menus, dynamic elements, login flows, and more.
 
 
