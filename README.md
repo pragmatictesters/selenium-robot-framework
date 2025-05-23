@@ -1,10 +1,10 @@
-# Robot Framework Automation Examples for The Internet Herokuapp
+# Robot Framework Automation Examples (Selenium + API ) 
+
+This project demonstrates the use of the Robot Framework for both Selenium-based web automation and API testing. It includes  example  test suites that showcase how Robot Framework can be  used to automate UI workflows and validate API endpoints. 
 
 [![API Tests Workflow](https://github.com/pragmatictesters/selenium-robot-framework/actions/workflows/robot-tests.yml/badge.svg)](https://github.com/pragmatictesters/selenium-robot-framework/actions/workflows/robot-tests.yml)
 
 [![Run Robot Framework API Tests in Docker](https://github.com/pragmatictesters/selenium-robot-framework/actions/workflows/robot-api-tests-docker.yml/badge.svg)](https://github.com/pragmatictesters/selenium-robot-framework/actions/workflows/robot-api-tests-docker.yml)
-
-This repository contains automation examples using the **Robot Framework** with **SeleniumLibrary** for interacting with components on [The Internet Herokuapp](https://the-internet.herokuapp.com/). It demonstrates real-world automation scenarios including working with alerts, context menus, dynamic elements, login flows, and more.
 
 
 ---
